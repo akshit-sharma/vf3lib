@@ -149,7 +149,7 @@ namespace vflib
 			std::vector<VF3SortingNode*> nodes(nodeCount);
 			std::vector<VF3SortingNode*> candidates; //Node candidate for the addition
 			std::vector<VF3SortingNode*>::iterator candidate_it;
-			std::vector<VF3SortingNode*>::iterator max_node;
+			//std::vector<VF3SortingNode*>::iterator max_node;
 			//Initializing the node vector for sorting
 
 			for (i = 0; i < nodeCount; i++)

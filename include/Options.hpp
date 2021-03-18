@@ -8,6 +8,7 @@
 #include <cinttypes>
 #include <stdio.h>
 #include <iostream>
+#include <memory>
 #include "VFLib.h"
 
 #define VF3PGSS	 (1)
@@ -160,15 +161,15 @@ vflib::ARGLoader<Node, Edge>* CreateLoader(const Options& opt, std::istream &in)
 	}
 }
 
-vflib::MatchingEngine<state_t>* CreateMatchingEngine(const Options& opt)
+std::unique_ptr<vflib::MatchingEngine<state_t>> CreateMatchingEngine(const Options& opt)
 {
 #ifdef VF3P
 	switch(opt.algo)
 	{
 		case VF3PGSS:
-			return new vflib::ParallelMatchingEngine<state_t >(opt.numOfThreads, opt.storeSolutions, opt.lockFree, opt.cpu);
+			return std::make_unique<vflib::ParallelMatchingEngine<state_t>>(opt.numOfThreads, opt.storeSolutions, opt.lockFree, opt.cpu);
 		case VF3PWLS:
-			return new vflib::ParallelMatchingEngineWLS<state_t >(opt.numOfThreads, opt.storeSolutions, opt.lockFree,
+			return std::make_unique<vflib::ParallelMatchingEngineWLS<state_t>>(opt.numOfThreads, opt.storeSolutions, opt.lockFree,
                 opt.cpu, opt.ssrHighLimit, opt.ssrLocalStackLimit);
 		default:
 			std::cout<<"Wrong Algorithm Selected\n";
@@ -177,7 +178,7 @@ vflib::MatchingEngine<state_t>* CreateMatchingEngine(const Options& opt)
 			return nullptr;
 	}
 #elif defined(VF3) || defined(VF3L)
-    return new vflib::MatchingEngine<state_t >(opt.storeSolutions);
+    return std::make_unique<vflib::MatchingEngine<state_t>>(opt.storeSolutions);
 #endif
 }
 

@@ -92,7 +92,7 @@ namespace vflib
 			std::vector<RISortingNode*> nodes(nodeCount);
 			std::vector<RISortingNode*> candidates; //Node candidate for the addition
 			std::vector<RISortingNode*>::iterator candidate_it;
-			std::vector<RISortingNode*>::iterator max_node;
+			//std::vector<RISortingNode*>::iterator max_node;
 			std::vector<RISortingNode*>::iterator start_it;
 
 			for (i = 0; i < nodeCount; i++)

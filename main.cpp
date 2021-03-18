@@ -3,6 +3,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <string>
+#include <memory>
 #include <time.h>
 #include <algorithm>
 #ifndef WIN32
@@ -65,7 +66,7 @@ int32_t main(int32_t argc, char** argv)
 {
 	Options opt;
 
-	uint32_t n1, n2;
+	//uint32_t n1, n2;
 	double timeAll = 0;
 	double totalExecTime= 0;
 	double timeFirst = 0;
@@ -133,10 +134,10 @@ int32_t main(int32_t argc, char** argv)
 		std::cout<<"Loaded in: "<<timeLoad<<std::endl;
 	}
 
-	n1 = patt_graph.NodeCount();
-	n2 = targ_graph.NodeCount();
+	//n1 = patt_graph.NodeCount();
+	//n2 = targ_graph.NodeCount();
 
-	MatchingEngine<state_t >* me = CreateMatchingEngine(opt);
+	std::unique_ptr<MatchingEngine<state_t>> me = CreateMatchingEngine(opt);
 
 	if(!me)
 	{
@@ -228,7 +229,7 @@ int32_t main(int32_t argc, char** argv)
 	{
 		std::cout << sols << " " << timeFirst << " " << timeAll << std::endl;
 	}
-	delete me;
+	//delete me;
   delete pattloader;
   delete targloader;
 	return 0;

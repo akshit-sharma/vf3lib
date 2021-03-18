@@ -83,6 +83,8 @@ namespace vflib
 		MatchingEngine(MatchingVisitor<VFState> *visit, bool storeSolutions = false):
 		 visit(visit), solCount(0), storeSolutions(storeSolutions){}
 
+		// virtual ~MatchingEngine() {} // not sure if required
+
 		#ifdef TRACE
 		inline void FlushTrace()
 		{
