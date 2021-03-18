@@ -164,13 +164,13 @@ namespace vflib
 		for (i = 0; i <= n1; i++)
 		{
 			if (i < n1) {
-				termin1_c[i] = (int*)calloc(classes_count, sizeof(int));
-				termout1_c[i] = (int*)calloc(classes_count, sizeof(int));
-				new1_c[i] = (int*)calloc(classes_count, sizeof(int));
+				termin1_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
+				termout1_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
+				new1_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
 			}
-			t1both_len_c[i] = (int*)calloc(classes_count, sizeof(int));
-			t1in_len_c[i] = (int*)calloc(classes_count, sizeof(int));
-			t1out_len_c[i] = (int*)calloc(classes_count, sizeof(int));
+			t1both_len_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
+			t1in_len_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
+			t1out_len_c[i] = (uint32_t*)calloc(classes_count, sizeof(uint32_t));
 		}
 
 		for (i = 0; i < n2; i++)
