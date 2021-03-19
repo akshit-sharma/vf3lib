@@ -141,7 +141,8 @@ VF3SubState<
 		uint32_t nclass,
 		nodeID_t *order,
 		bool induced)
-	: State(ag1->NodeCount(), ag2->NodeCount(), order, induced)
+	: State(ag1->NodeCount(), ag2->NodeCount(), order, induced),
+  induced(induced)
 {
 	assert(class_1 != NULL && class_2 != NULL);
 
@@ -224,7 +225,7 @@ VF3SubState<
 	Edge2,
 	NodeComparisonFunctor,
 	EdgeComparisonFunctor>::VF3SubState(const VF3SubState &state)
-	: State(state)
+	: State(state), induced(state.induced)
 {
 	g1 = state.g1;
 	g2 = state.g2;
