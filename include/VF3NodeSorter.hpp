@@ -177,6 +177,10 @@ public:
 			}
 		}
 
+		for (i = 0; i < nodeCount; i++) {
+			delete nodes[i];
+		}
+
 		return nodes_order;
 	}
 };
