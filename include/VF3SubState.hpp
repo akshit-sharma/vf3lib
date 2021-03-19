@@ -298,31 +298,31 @@ VF3SubState<
 		delete[] t1both_len;
 		delete[] t1in_len;
 		delete[] t1out_len;
-		delete[] termin1;
-		delete[] termout1;
-		delete[] new1;
+		free(termin1);
+		free(termout1);
+    free(new1);
 
 		for (uint32_t i = 0; i <= n1; i++) {
-			delete[] t1both_len_c[i];
-			delete[] t1in_len_c[i];
-			delete[] t1out_len_c[i];
+			free(t1both_len_c[i]);
+      free(t1in_len_c[i]);
+		  free(t1out_len_c[i]);
 			if (i < n1) {
-				delete[] termin1_c[i];
-				delete[] termout1_c[i];
-				delete[] new1_c[i];
+				free(termin1_c[i]);
+				free(termout1_c[i]);
+				free(new1_c[i]);
 			}
 		}
 
-		delete[] t1both_len_c;
-		delete[] t1in_len_c;
-		delete[] t1out_len_c;
-		delete[] termin1_c;
-		delete[] termout1_c;
-		delete[] new1_c;
-		delete[] t2both_len_c;
-		delete[] t2in_len_c;
-		delete[] t2out_len_c;
-		delete[] core_len_c;
+		free(t1both_len_c);
+		free(t1in_len_c);
+		free(t1out_len_c);
+		free(termin1_c);
+		free(termout1_c);
+		free(new1_c);
+	  free(t2both_len_c);
+		free(t2in_len_c);
+		free(t2out_len_c);
+		free(core_len_c);
 		delete[] termin2_c;
 		delete[] termout2_c;
 		delete[] new2_c;
