@@ -31,7 +31,7 @@ template<
 	typename Edge2,
 	typename NodeComparisonFunctor = EqualityComparator<Node1, Node2>,
 	typename EdgeComparisonFunctor = EqualityComparator<Edge1, Edge2>>
-class VF3SubState : public State
+class VF3SubState final : public State
 {
 private:
 	bool induced;
@@ -101,7 +101,7 @@ public:
 		nodeID_t *order = NULL,
 		bool induced = true);
 	VF3SubState(const VF3SubState &state);
-	~VF3SubState();
+	virtual ~VF3SubState();
 	inline ARGraph<Node1, Edge1> *GetGraph1() const { return g1; }
 	inline ARGraph<Node2, Edge2> *GetGraph2() const { return g2; }
 	bool NextPair(

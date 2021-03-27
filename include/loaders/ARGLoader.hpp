@@ -30,7 +30,7 @@
 #include <map>
 #include <sstream>
 
-#include <ARGEdit.hpp>
+#include "ARGEdit.hpp"
 
 namespace vflib {
 

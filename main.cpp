@@ -75,14 +75,13 @@ int32_t main(int32_t argc, char **argv)
 	double timeAll = 0;
 	double totalExecTime = 0;
 	double timeFirst = 0;
-	double timeLast = 0;
 	double timeLoad = 0;
 	int rep = 0;
 	struct timeval start, loading, fastcheck, classification, iter, end;
 	std::vector<MatchingSolution> solutions;
 	std::vector<uint32_t> class_patt;
 	std::vector<uint32_t> class_targ;
-	uint32_t classes_count;
+	uint32_t classes_count = 0;
 
 	state_counter = 0;
 	size_t sols = 0;

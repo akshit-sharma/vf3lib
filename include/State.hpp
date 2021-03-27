@@ -98,7 +98,7 @@ public:
 		++*share_count;
 	}
 
-	~State()
+	virtual ~State()
 	{
 		if (*share_count == 0) {
 			delete[] core_1;

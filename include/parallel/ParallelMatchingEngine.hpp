@@ -261,7 +261,7 @@ public:
 	void StartPool()
 	{
 		int current_cpu = cpu;
-		for (size_t i = 0; i < numThreads; ++i) {
+		for (int16_t i = 0; i < numThreads; ++i) {
 			pool[i] = std::thread([this, i] { this->Run(i); });
 #ifndef WIN32
 			// If cpu is not -1 set the thread affinity starting from the cpu

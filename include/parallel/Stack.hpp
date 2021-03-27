@@ -9,6 +9,8 @@ public:
 	virtual void push(T const &data) = 0;
 	virtual size_t size() = 0;
 	virtual std::shared_ptr<T> pop() = 0;
+  
+  virtual ~Stack() {}
 };
 
 }// namespace vflib

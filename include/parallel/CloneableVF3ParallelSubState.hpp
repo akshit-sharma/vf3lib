@@ -47,16 +47,16 @@ private:
 	ARGraph<Node2, Edge2> *g2;
 
 	// Size of each graph
-	int n1, n2;
+	uint32_t n1, n2;
 
 	nodeID_t *order;// Order to traverse node on the first graph
 
 	// CORE SET SIZES
-	int core_len;// Current length of the core set
-	int orig_core_len;// Core set length of the previous state
+	uint32_t core_len;// Current length of the core set
+	uint32_t orig_core_len;// Core set length of the previous state
 	// int *core_len_c;    //Core set length for each class
 
-	int added_node1;// Last added node
+	nodeID_t added_node1;// Last added node
 
 	// nodeID_t* predecessors;  //Previous node in the ordered sequence connected
 	// to a node
@@ -69,7 +69,7 @@ private:
 
 	// Vector of sets used for searching the successors
 	// Each class has its set
-	int last_candidate_index;
+	nodeID_t last_candidate_index;
 
 	/* Structures for classes */
 	uint32_t *class_1;// Classes for nodes of the first graph
@@ -171,7 +171,7 @@ CloneableVF3ParallelSubState<
 
 	added_node1 = NULL_NODE;
 
-	int i;
+	nodeID_t i;
 	for (i = 0; i < n1; i++) {
 		(*core_1)[i] = NULL_NODE;
 		dir[i] = NODE_DIR_NONE;
@@ -256,7 +256,6 @@ void CloneableVF3ParallelSubState<
 	// The algorithm start with the node with the maximum degree
 	nodeID_t depth, i;
 	nodeID_t node;// Current Node
-	int node_c;// Class of the current node
 	bool *inserted = new bool[n1];
 	bool *in, *out;// Internal Terminal Set used for updating the size of
 	in = new bool[n1];
@@ -264,7 +263,6 @@ void CloneableVF3ParallelSubState<
 
 	// Init vectors and variables
 	node = 0;
-	node_c = 0;
 
 	for (i = 0; i < n1; i++) {
 		in[i] = false;
@@ -275,7 +273,6 @@ void CloneableVF3ParallelSubState<
 	/* Following the imposed node order */
 	for (depth = 0; depth < n1; depth++) {
 		node = order[depth];
-		node_c = class_1[node];
 		inserted[node] = true;
 
 		// Inserting the node
@@ -287,12 +284,10 @@ void CloneableVF3ParallelSubState<
 		if (!out[node]) out[node] = true;
 
 		// Updating terminal sets
-		int i, other, other_c;
-		other_c = -1;
+		nodeID_t i, other;
 		for (i = 0; i < g1->InEdgeCount(node); i++) {
 			other = g1->GetInEdge(node, i);
 			if (!in[other]) {
-				other_c = class_1[other];
 				in[other] = true;
 				if (!inserted[other]) {
 					if (predecessors[other] == NULL_NODE) {
@@ -306,7 +301,6 @@ void CloneableVF3ParallelSubState<
 		for (i = 0; i < g1->OutEdgeCount(node); i++) {
 			other = g1->GetOutEdge(node, i);
 			if (!out[other]) {
-				other_c = class_1[other];
 				out[other] = true;
 				if (!inserted[other]) {
 					if (predecessors[other] == NULL_NODE) {
@@ -343,7 +337,7 @@ bool CloneableVF3ParallelSubState<
 	nodeID_t curr_n1;
 	nodeID_t pred_pair;// Node mapped with the predecessor
 	nodeID_t pred_set_size = 0;
-	int c = 0;
+	uint32_t c = 0;
 	pred_pair = NULL_NODE;
 
 	// core_len indica la profondondita' della ricerca
@@ -452,14 +446,13 @@ bool CloneableVF3ParallelSubState<
 		|| g1->OutEdgeCount(node1) > g2->OutEdgeCount(node2))
 		return false;
 
-	int i, other1, other2, c_other;
+	uint32_t i, other1, other2;
 	Edge1 eattr1;
 	Edge2 eattr2;
 
 	// Check the 'out' edges of node1
 	for (i = 0; i < g1->OutEdgeCount(node1); i++) {
 		other1 = g1->GetOutEdge(node1, i, eattr1);
-		c_other = class_1[other1];
 		if ((*core_1)[other1] != NULL_NODE) {
 			other2 = (*core_1)[other1];
 			if (!g2->HasEdge(node2, other2, eattr2) || !ef(eattr1, eattr2))
@@ -470,7 +463,6 @@ bool CloneableVF3ParallelSubState<
 	// Check the 'in' edges of node1
 	for (i = 0; i < g1->InEdgeCount(node1); i++) {
 		other1 = g1->GetInEdge(node1, i, eattr1);
-		c_other = class_1[other1];
 		if ((*core_1)[other1] != NULL_NODE) {
 			other2 = (*core_1)[other1];
 			if (!g2->HasEdge(other2, node2, eattr2) || !ef(eattr1, eattr2))
@@ -481,7 +473,6 @@ bool CloneableVF3ParallelSubState<
 	// Check the 'out' edges of node2
 	for (i = 0; i < g2->OutEdgeCount(node2); i++) {
 		other2 = g2->GetOutEdge(node2, i);
-		c_other = class_2[other2];
 		if ((*core_2)[other2] != NULL_NODE) {
 			other1 = (*core_2)[other2];
 			if (!g1->HasEdge(node1, other1)) return false;
@@ -491,7 +482,6 @@ bool CloneableVF3ParallelSubState<
 	// Check the 'in' edges of node2
 	for (i = 0; i < g2->InEdgeCount(node2); i++) {
 		other2 = g2->GetInEdge(node2, i);
-		c_other = class_2[other2];
 		if ((*core_2)[other2] != NULL_NODE) {
 			other1 = (*core_2)[other2];
 			if (!g1->HasEdge(other1, node1)) return false;
@@ -601,11 +591,10 @@ void CloneableVF3ParallelSubState<
 
 	assert(core_len - orig_core_len <= 1);
 	if (added_node1 != NULL_NODE) {
-		int32_t other_c = 0;
 		int32_t node_c = class_1[added_node1];
 
 		if (orig_core_len < core_len) {
-			int32_t i, node2;
+			int32_t node2;
 			node2 = (*core_1)[added_node1];
 
 			(*core_1)[added_node1] = NULL_NODE;

@@ -233,7 +233,6 @@ void VF3LightSubState<
 	// The algorithm start with the node with the maximum degree
 	nodeID_t depth, i;
 	nodeID_t node;// Current Node
-	int32_t node_c;// Class of the current node
 	bool *inserted = new bool[n1];
 	bool *in, *out;// Internal Terminal Set used for updating the size of
 	in = new bool[n1];
@@ -241,7 +240,6 @@ void VF3LightSubState<
 
 	// Init vectors and variables
 	node = 0;
-	node_c = 0;
 
 	for (i = 0; i < n1; i++) {
 		in[i] = false;
@@ -254,7 +252,6 @@ void VF3LightSubState<
 	/* Following the imposed node order */
 	for (depth = 0; depth < n1; depth++) {
 		node = order[depth];
-		node_c = class_1[node];
 		inserted[node] = true;
 
 		// Inserting the node
@@ -266,12 +263,10 @@ void VF3LightSubState<
 		if (!out[node]) out[node] = true;
 
 		// Updating terminal sets
-		int32_t i, other, other_c;
-		other_c = -1;
+		uint32_t i, other;
 		for (i = 0; i < g1->InEdgeCount(node); i++) {
 			other = g1->GetInEdge(node, i);
 			if (!in[other]) {
-				other_c = class_1[other];
 				in[other] = true;
 				if (!inserted[other]) {
 					if (predecessors[other] == NULL_NODE) {
@@ -285,7 +280,6 @@ void VF3LightSubState<
 		for (i = 0; i < g1->OutEdgeCount(node); i++) {
 			other = g1->GetOutEdge(node, i);
 			if (!out[other]) {
-				other_c = class_1[other];
 				out[other] = true;
 				if (!inserted[other]) {
 					if (predecessors[other] == NULL_NODE) {
@@ -322,7 +316,7 @@ bool VF3LightSubState<
 	nodeID_t curr_n1;
 	nodeID_t pred_pair;// Node mapped with the predecessor
 	nodeID_t pred_set_size = 0;
-	int32_t c = 0;
+	uint32_t c = 0;
 	pred_pair = NULL_NODE;
 
 	// core_len indica la profondondita' della ricerca
@@ -431,14 +425,13 @@ bool VF3LightSubState<
 		|| g1->OutEdgeCount(node1) > g2->OutEdgeCount(node2))
 		return false;
 
-	uint32_t i, other1, other2, c_other;
+	uint32_t i, other1, other2;
 	Edge1 eattr1;
 	Edge2 eattr2;
 
 	// Check the 'out' edges of node1
 	for (i = 0; i < g1->OutEdgeCount(node1); i++) {
 		other1 = g1->GetOutEdge(node1, i, eattr1);
-		c_other = class_1[other1];
 		if (core_1[other1] != NULL_NODE) {
 			other2 = core_1[other1];
 			if (!g2->HasEdge(node2, other2, eattr2) || !ef(eattr1, eattr2))
@@ -449,7 +442,6 @@ bool VF3LightSubState<
 	// Check the 'in' edges of node1
 	for (i = 0; i < g1->InEdgeCount(node1); i++) {
 		other1 = g1->GetInEdge(node1, i, eattr1);
-		c_other = class_1[other1];
 		if (core_1[other1] != NULL_NODE) {
 			other2 = core_1[other1];
 			if (!g2->HasEdge(other2, node2, eattr2) || !ef(eattr1, eattr2))
@@ -461,7 +453,6 @@ bool VF3LightSubState<
 	if (induced) {
 		for (i = 0; i < g2->OutEdgeCount(node2); i++) {
 			other2 = g2->GetOutEdge(node2, i);
-			c_other = class_2[other2];
 			if (core_2[other2] != NULL_NODE) {
 				other1 = core_2[other2];
 				if (!g1->HasEdge(node1, other1)) return false;
@@ -471,7 +462,6 @@ bool VF3LightSubState<
 		// Check the 'in' edges of node2
 		for (i = 0; i < g2->InEdgeCount(node2); i++) {
 			other2 = g2->GetInEdge(node2, i);
-			c_other = class_2[other2];
 			if (core_2[other2] != NULL_NODE) {
 				other1 = core_2[other2];
 				if (!g1->HasEdge(other1, node1)) return false;
@@ -552,11 +542,10 @@ void VF3LightSubState<
 
 	assert(core_len - orig_core_len <= 1);
 	if (added_node1 != NULL_NODE) {
-		int32_t other_c = 0;
 		int32_t node_c = class_1[added_node1];
 
 		if (orig_core_len < core_len) {
-			int32_t i, node2;
+			int32_t node2;
 			node2 = core_1[added_node1];
 
 			core_1[added_node1] = NULL_NODE;
