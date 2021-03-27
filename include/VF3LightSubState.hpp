@@ -33,7 +33,7 @@ template<
 class VF3LightSubState : public State
 {
 private:
-	bool induced;
+	// bool induced; // set in State
 
 	// Comparison functors for nodes and edges
 	NodeComparisonFunctor nf;

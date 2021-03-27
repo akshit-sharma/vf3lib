@@ -82,7 +82,7 @@ public:
 		: visit(visit), solCount(0), storeSolutions(storeSolutions)
 	{}
 
-	// virtual ~MatchingEngine() {} // not sure if required
+	virtual ~MatchingEngine() {} // not sure if required
 
 #ifdef TRACE
 	inline void FlushTrace() { trace->CSVFlush(); }
