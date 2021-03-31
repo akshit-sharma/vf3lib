@@ -16,8 +16,22 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <tuple>
 
 namespace vflib {
+  
+  struct Node2Counters {
+    uint32_t termout2, termin2, new2;
+    Node2Counters() : termout2(0), termin2(0), new2(0) {}
+    Node2Counters(uint32_t termout2, uint32_t termin2, uint32_t new2) 
+      : termout2(termout2), termin2(termin2), new2(new2) {}
+    Node2Counters& operator+=(const Node2Counters& rhs) {
+      termout2 += rhs.termout2;
+      termin2 += rhs.termin2;
+      new2 += rhs.new2;
+      return *this;
+    }
+  };
 
 /*----------------------------------------------------------
  * @class VF3SubState
@@ -89,6 +103,12 @@ private:
 	void ComputeFirstGraphTraversing();
 	void UpdateTerminalSetSize(
 		nodeID_t node, nodeID_t level, bool *in_1, bool *out_1, bool *inserted);
+  
+  bool CheckOutEdgeForNode1(nodeID_t node1, nodeID_t node2);
+  bool CheckInEdgeForNode1(nodeID_t node1, nodeID_t node2);
+  std::tuple<bool, Node2Counters> CheckOutEdgeForNode2(nodeID_t node1, nodeID_t node2);
+  std::tuple<bool, Node2Counters> CheckInEdgeForNode2(nodeID_t node1, nodeID_t node2);
+  bool LookAhead(const Node2Counters & node2counter);
 
 public:
 	static long long instance_count;
@@ -328,6 +348,193 @@ VF3SubState<
 		delete[] termout2_c;
 		delete[] new2_c;
 	}
+}
+
+template<
+	typename Node1,
+	typename Node2,
+	typename Edge1,
+	typename Edge2,
+	typename NodeComparisonFunctor,
+	typename EdgeComparisonFunctor>
+bool VF3SubState<
+	Node1,
+	Node2,
+	Edge1,
+	Edge2,
+	NodeComparisonFunctor,
+	EdgeComparisonFunctor>::CheckOutEdgeForNode1(nodeID_t node1, nodeID_t node2) {
+
+  Edge1 eattr1;
+  Edge2 eattr2;
+	
+  // Check the 'out' edges of node1
+	for (uint32_t i = 0; i < g1->OutEdgeCount(node1); i++) {
+		uint32_t other1 = g1->GetOutEdge(node1, i, eattr1);
+		uint32_t c_other = class_1[other1];
+		if (core_1[other1] != NULL_NODE) {
+			uint32_t other2 = core_1[other1];
+			if (!g2->HasEdge(node2, other2, eattr2) || !ef(eattr1, eattr2))
+				return false;
+		}
+	}
+  return true;
+}
+
+template<
+	typename Node1,
+	typename Node2,
+	typename Edge1,
+	typename Edge2,
+	typename NodeComparisonFunctor,
+	typename EdgeComparisonFunctor>
+bool VF3SubState<
+	Node1,
+	Node2,
+	Edge1,
+	Edge2,
+	NodeComparisonFunctor,
+	EdgeComparisonFunctor>::CheckInEdgeForNode1(nodeID_t node1, nodeID_t node2) {
+
+  Edge1 eattr1;
+  Edge2 eattr2;
+	
+	// Check the 'in' edges of node1
+	for (uint32_t i = 0; i < g1->InEdgeCount(node1); i++) {
+		uint32_t other1 = g1->GetInEdge(node1, i, eattr1);
+		uint32_t c_other = class_1[other1];
+		if (core_1[other1] != NULL_NODE) {
+			uint32_t other2 = core_1[other1];
+			if (!g2->HasEdge(other2, node2, eattr2) || !ef(eattr1, eattr2))
+				return false;
+		}
+	}
+  return true;
+}
+
+template<
+	typename Node1,
+	typename Node2,
+	typename Edge1,
+	typename Edge2,
+	typename NodeComparisonFunctor,
+	typename EdgeComparisonFunctor>
+std::tuple<bool, Node2Counters> VF3SubState<
+	Node1,
+	Node2,
+	Edge1,
+	Edge2,
+	NodeComparisonFunctor,
+	EdgeComparisonFunctor>::CheckOutEdgeForNode2(nodeID_t node1, nodeID_t node2) {
+
+  uint32_t termout2 = 0, termin2 = 0, new2 = 0;
+
+	// Check the 'out' edges of node2
+	for (uint32_t i = 0; i < g2->OutEdgeCount(node2); i++) {
+		uint32_t other2 = g2->GetOutEdge(node2, i);
+		uint32_t c_other = class_2[other2];
+		if (core_2[other2] != NULL_NODE) {
+			if (induced) {
+				uint32_t other1 = core_2[other2];
+				if (!g1->HasEdge(node1, other1)) return std::make_tuple(false, Node2Counters());
+			}
+		} else {
+			if (in_2[other2]) {
+				termin2++;
+				termin2_c[c_other]++;
+			}
+			if (out_2[other2]) {
+				termout2++;
+				termout2_c[c_other]++;
+			}
+			if (!in_2[other2] && !out_2[other2]) {
+				new2++;
+				new2_c[c_other]++;
+			}
+		}
+	}	
+  return std::make_tuple(true, Node2Counters(termout2, termin2, new2));
+}
+
+template<
+	typename Node1,
+	typename Node2,
+	typename Edge1,
+	typename Edge2,
+	typename NodeComparisonFunctor,
+	typename EdgeComparisonFunctor>
+std::tuple<bool, Node2Counters> VF3SubState<
+	Node1,
+	Node2,
+	Edge1,
+	Edge2,
+	NodeComparisonFunctor,
+	EdgeComparisonFunctor>::CheckInEdgeForNode2(nodeID_t node1, nodeID_t node2) {
+
+  uint32_t termout2 = 0, termin2 = 0, new2 = 0;
+	
+  // Check the 'in' edges of node2
+	for (uint32_t i = 0; i < g2->InEdgeCount(node2); i++) {
+		uint32_t other2 = g2->GetInEdge(node2, i);
+		uint32_t c_other = class_2[other2];
+		if (core_2[other2] != NULL_NODE) {
+			if (induced) {
+				uint32_t other1 = core_2[other2];
+				if (!g1->HasEdge(node1, other1)) return std::make_tuple(false, Node2Counters());
+			}
+		} else {
+			if (in_2[other2]) {
+				termin2++;
+				termin2_c[c_other]++;
+			}
+			if (out_2[other2]) {
+				termout2++;
+				termout2_c[c_other]++;
+			}
+			if (!in_2[other2] && !out_2[other2]) {
+				new2++;
+				new2_c[c_other]++;
+			}
+		}
+	}
+  return std::make_tuple(true, Node2Counters(termout2, termin2, new2));
+}
+
+template<
+	typename Node1,
+	typename Node2,
+	typename Edge1,
+	typename Edge2,
+	typename NodeComparisonFunctor,
+	typename EdgeComparisonFunctor>
+bool VF3SubState<
+	Node1,
+	Node2,
+	Edge1,
+	Edge2,
+	NodeComparisonFunctor,
+	EdgeComparisonFunctor>::LookAhead(const Node2Counters & node2counter) {
+	// Look-ahead check
+	if (termin1[core_len] <= node2counter.termin2 
+      && termout1[core_len] <= node2counter.termout2) {
+		for (uint32_t i = 0; i < classes_count; i++) {
+			if (
+				termin1_c[core_len][i] > termin2_c[i]
+				|| termout1_c[core_len][i] > termout2_c[i]) {
+				return false;
+			}
+		}
+	} else
+		return false;
+
+	if (new1[core_len] <= node2counter.new2) {
+		for (uint32_t i = 0; i < classes_count; i++) {
+			if (new1_c[core_len][i] > new2_c[i]) return false;
+		}
+	} else
+		return false;
+
+  return true;
 }
 
 template<
@@ -662,104 +869,28 @@ bool VF3SubState<
 		|| g1->OutEdgeCount(node1) > g2->OutEdgeCount(node2))
 		return false;
 
-	uint32_t i, other1, other2, c_other;
-	Edge1 eattr1;
-	Edge2 eattr2;
-	uint32_t termout2 = 0, termin2 = 0, new2 = 0;
+	// uint32_t i, other1, other2, c_other;
+	// Edge1 eattr1;
+	// Edge2 eattr2;
+	// uint32_t termout2 = 0, termin2 = 0, new2 = 0;
 	memset(termin2_c, 0, classes_count * sizeof(uint32_t));
 	memset(termout2_c, 0, classes_count * sizeof(uint32_t));
 	memset(new2_c, 0, classes_count * sizeof(uint32_t));
 
-	// Check the 'out' edges of node1
-	for (i = 0; i < g1->OutEdgeCount(node1); i++) {
-		other1 = g1->GetOutEdge(node1, i, eattr1);
-		c_other = class_1[other1];
-		if (core_1[other1] != NULL_NODE) {
-			other2 = core_1[other1];
-			if (!g2->HasEdge(node2, other2, eattr2) || !ef(eattr1, eattr2))
-				return false;
-		}
-	}
+  if (!CheckOutEdgeForNode1(node1, node2))
+    return false;
 
-	// Check the 'in' edges of node1
-	for (i = 0; i < g1->InEdgeCount(node1); i++) {
-		other1 = g1->GetInEdge(node1, i, eattr1);
-		c_other = class_1[other1];
-		if (core_1[other1] != NULL_NODE) {
-			other2 = core_1[other1];
-			if (!g2->HasEdge(other2, node2, eattr2) || !ef(eattr1, eattr2))
-				return false;
-		}
-	}
+  if (!CheckInEdgeForNode1(node1, node2))
+    return false;
 
-	// Check the 'out' edges of node2
-	for (i = 0; i < g2->OutEdgeCount(node2); i++) {
-		other2 = g2->GetOutEdge(node2, i);
-		c_other = class_2[other2];
-		if (core_2[other2] != NULL_NODE) {
-			if (induced) {
-				other1 = core_2[other2];
-				if (!g1->HasEdge(node1, other1)) return false;
-			}
-		} else {
-			if (in_2[other2]) {
-				termin2++;
-				termin2_c[c_other]++;
-			}
-			if (out_2[other2]) {
-				termout2++;
-				termout2_c[c_other]++;
-			}
-			if (!in_2[other2] && !out_2[other2]) {
-				new2++;
-				new2_c[c_other]++;
-			}
-		}
-	}
+  auto [ cont1, node2Count ] = CheckOutEdgeForNode2(node1, node2);
+  if (!cont1) return false;
+  auto [ cont2, node2Count2 ] = CheckInEdgeForNode2(node1, node2);
+  if (!cont2) return false;
 
-	// Check the 'in' edges of node2
-	for (i = 0; i < g2->InEdgeCount(node2); i++) {
-		other2 = g2->GetInEdge(node2, i);
-		c_other = class_2[other2];
-		if (core_2[other2] != NULL_NODE) {
-			if (induced) {
-				other1 = core_2[other2];
-				if (!g1->HasEdge(other1, node1)) return false;
-			}
-		} else {
-			if (in_2[other2]) {
-				termin2++;
-				termin2_c[c_other]++;
-			}
-			if (out_2[other2]) {
-				termout2++;
-				termout2_c[c_other]++;
-			}
-			if (!in_2[other2] && !out_2[other2]) {
-				new2++;
-				new2_c[c_other]++;
-			}
-		}
-	}
+  node2Count += node2Count2;
 
-	// Look-ahead check
-	if (termin1[core_len] <= termin2 && termout1[core_len] <= termout2) {
-		for (i = 0; i < classes_count; i++) {
-			if (
-				termin1_c[core_len][i] > termin2_c[i]
-				|| termout1_c[core_len][i] > termout2_c[i]) {
-				return false;
-			}
-		}
-	} else
-		return false;
-
-	if (new1[core_len] <= new2) {
-		for (i = 0; i < classes_count; i++) {
-			if (new1_c[core_len][i] > new2_c[i]) return false;
-		}
-	} else
-		return false;
+  if (!LookAhead(node2Count)) return false;
 
 	// std::cout << "\nIs Feasible: " << node1 << " " << node2;
 	return true;
