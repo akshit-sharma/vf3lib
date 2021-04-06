@@ -63,6 +63,8 @@ EdgeStreamARGLoader<Node, Edge>::EdgeStreamARGLoader(
 	last_edge_node = NULL_NODE;
 	uint32_t count = 0;
 
+  std::cout << "EdgeStreamARGLoader \n";
+
 	if (!in.good()) error("End of file or reading error");
 
 	skipHeading(in);

@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS= -std=c++14 -march=native -O3 -Werror -Wall
+CFLAGS= -std=c++17 -march=native -O3 -Werror -Wall
 LDFLAGS= -lpthread -latomic
 CPPFLAGS= -I./include
 

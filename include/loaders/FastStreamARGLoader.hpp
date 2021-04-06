@@ -49,6 +49,8 @@ FastStreamARGLoader<Node, Edge>::FastStreamARGLoader(
 {
 	last_edge_node = NULL_NODE;
 
+  std::cout << "FastStreamARGLoader \n";
+
 	if (!in.good()) error("End of file or reading error");
 
 	in >> node_count;

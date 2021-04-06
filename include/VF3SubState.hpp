@@ -371,7 +371,7 @@ bool VF3SubState<
   // Check the 'out' edges of node1
 	for (uint32_t i = 0; i < g1->OutEdgeCount(node1); i++) {
 		uint32_t other1 = g1->GetOutEdge(node1, i, eattr1);
-		uint32_t c_other = class_1[other1];
+		// uint32_t c_other = class_1[other1];
 		if (core_1[other1] != NULL_NODE) {
 			uint32_t other2 = core_1[other1];
 			if (!g2->HasEdge(node2, other2, eattr2) || !ef(eattr1, eattr2))
@@ -402,7 +402,7 @@ bool VF3SubState<
 	// Check the 'in' edges of node1
 	for (uint32_t i = 0; i < g1->InEdgeCount(node1); i++) {
 		uint32_t other1 = g1->GetInEdge(node1, i, eattr1);
-		uint32_t c_other = class_1[other1];
+		// uint32_t c_other = class_1[other1];
 		if (core_1[other1] != NULL_NODE) {
 			uint32_t other2 = core_1[other1];
 			if (!g2->HasEdge(other2, node2, eattr2) || !ef(eattr1, eattr2))
