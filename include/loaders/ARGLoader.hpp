@@ -26,7 +26,7 @@
 #define ARGLOADER_H
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <map>
 #include <ctype.h>
 
@@ -173,7 +173,7 @@ namespace vflib
 		readLine(in, line);
 
 		int64_t i;
-		std::istrstream is(line);
+		std::istringstream is(line);
 		is >> i;
 
 		return i;
@@ -189,7 +189,7 @@ namespace vflib
 	{
 		char line[MAX_LINE + 1];
 		readLine(in, line);
-		std::istrstream is(line);
+		std::istringstream is(line);
 
 		Node nattr;
 		nodeID_t id;
@@ -212,7 +212,7 @@ namespace vflib
 	{
 		char line[MAX_LINE + 1];
 		readLine(in, line);
-		std::istrstream is(line);
+		std::istringstream is(line);
 
 		Edge eattr;
 		nodeID_t id1, id2;

@@ -226,7 +226,7 @@ int32_t main(int32_t argc, char** argv)
 		std::cout<<"Solutions: "<<sols<<std::endl;
 	}else
 	{
-		std::cout << sols << " " << timeFirst << " " << timeAll;
+		std::cout << sols << " " << timeFirst << " " << timeAll << std::endl;
 	}
 	delete me;
   delete pattloader;

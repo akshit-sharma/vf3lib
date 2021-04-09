@@ -55,7 +55,7 @@ namespace vflib
 		*/
 		virtual bool operator()(VFState& state) = 0;
 
-		virtual ~MatchingVisitor();
+		virtual ~MatchingVisitor() = default;
 	};
 
 	template <typename VFState >
